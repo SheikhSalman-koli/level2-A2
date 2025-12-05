@@ -6,12 +6,15 @@ const getAllUser =async (req:Request, res: Response) => {
                 const result = await userServices.getAllUser()
                 res.status(201).json({
                     success: true,
-                    message: 'Vehicle created successfully',
-                    user: result.rows[0]
+                    message: "Users retrieved successfully",
+                    data: result.rows
                 });
-            } catch (err) {
-                console.error('Error inserting user:', err);
-                res.status(500).json({ error: 'Internal server error' });
+            } catch (err: any) {
+                res.status(500).json({
+            success: false,
+            message: "Failed to retrieve users",
+            error: err.message
+        })
             } 
 }
 

@@ -8,7 +8,7 @@ const creatUser = async (req: Request, res: Response) => {
         res.status(201).json({
             success: true,
             message: "User registered successfully",
-            user: result.rows[0]
+            data: result.rows[0]
         });
     } catch (err: any) {
         res.status(500).json({
@@ -40,8 +40,8 @@ const loginUser = async (req: Request, res: Response) => {
 
         res.status(200).json({
             success: true,
-            message: "User logged in successfully",
-            user: result
+            message: "Login successful",
+            data: result
         });
     } catch (err: any) {
         res.status(500).json({

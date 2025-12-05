@@ -24,7 +24,7 @@ app.get('/', (req: Request, res: Response) => {
 app.use("/api/v1/auth", authRouter)
 
 // user router
-app.use('api/v1/users', userRouter);
+app.use('/api/v1/users', userRouter);
 
 // vehicle router
 app.use( "/api/v1/vehicles", vehicleRouter)
