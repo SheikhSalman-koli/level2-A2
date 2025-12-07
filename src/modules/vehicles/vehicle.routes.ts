@@ -1,9 +1,10 @@
 import { Router } from "express";
 import { vehicleController } from "./vehicle.controller";
+import verifyToken from "../../middleware/verifyToken";
 
 const router = Router();
 
-router.post('/', vehicleController.createVehecle) 
+router.post('/',verifyToken('admin'), vehicleController.createVehecle) 
 
 router.get('/', vehicleController.getAllVehicles) 
 
