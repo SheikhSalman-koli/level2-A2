@@ -48,7 +48,7 @@ const loginUser = async (payload: Record<string, unknown>) => {
         role: user.role
     }
 
-    const token = jwt.sign(jwtSign, config.jwtSecret as string, { expiresIn: '1h' })
+    const token = jwt.sign(jwtSign, config.jwtSecret as string, { expiresIn: '1d' })
 
     return {
         user, token
