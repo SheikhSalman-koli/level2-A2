@@ -10,6 +10,7 @@ const updateUser = async (payload: Record<string, unknown>, id: string | undefin
   const { name, email, password, phone, role } = payload;
 
   let hashedPassword = null;
+  
   if (password) {
     hashedPassword = await bcrypt.hash(password as string, 10);
   }

@@ -7,11 +7,14 @@ const createVehecle = async (req: Request, res: Response) => {
         res.status(201).json({
             success: true,
             message: 'Vehicle created successfully',
-            user: result.rows[0]
+            data: result.rows[0]
         });
-    } catch (err) {
-        console.error('Error inserting user:', err);
-        res.status(500).json({ error: 'Internal server error' });
+    } catch (err:any) {
+            res.status(500).json({
+            success: false,
+            message: "Failed to create vehicle",
+            error: err.message
+        })
     }
 }
 
