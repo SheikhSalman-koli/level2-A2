@@ -29,7 +29,6 @@ const getBookings = async (req: Request, res: Response) => {
         if(role === "admin"){
             result = await bookingServices.getAllBookings();
         } else if(role === "customer"){
-            //customer can see only their bookings
             result = await bookingServices.getCustomerBookings(id);
         }
         
@@ -48,9 +47,39 @@ const getBookings = async (req: Request, res: Response) => {
 }
 
 
+const updateBooking = async (req: Request, res: Response) => {
+    try {
+        const {role} = req.user as { role: string};
+        const { bookingId } = req.params;
+
+        let result: any;
+
+        if(role === "admin" ){
+            result = await bookingServices.returnedBooking(bookingId, req.body);
+        } else if(role === "customer"){
+            result = await bookingServices.cancelBooking(bookingId, req.body);
+        }
+
+        // const updatedBooking = await bookingServices.cancelBooking(bookingId, req.body, );
+        res.status(200).json({
+            success: true,
+            message: "Booking updated successfully",
+            data: role === 'admin' ? result : result.rows[0]
+        });
+    } catch (err:any) {
+        res.status(500).json({
+            success: false,
+            message: "Failed to update booking",
+            error: err.message
+        });
+    }
+}
+
+
 
 
 export const bookingController = {
     createBooking,
-    getBookings
+    getBookings,
+    updateBooking
 }

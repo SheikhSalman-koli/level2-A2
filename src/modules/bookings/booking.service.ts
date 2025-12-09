@@ -2,12 +2,19 @@ import { pool } from "../../config/db";
 
 
 const createBooking = async (payload: Record<string, unknown>) => {
-
     const { customer_id, vehicle_id, rent_start_date, rent_end_date } = payload;
 
     const vehicleData = await pool.query(`
         SELECT vehicle_name, daily_rent_price FROM vehicles WHERE id = $1
-        `, [vehicle_id])
+        `, [vehicle_id]
+    )
+
+    await pool.query(`
+        UPDATE vehicles SET 
+            availability_status = COALESCE($1, availability_status)
+        WHERE id = $2
+    `, ['booked', vehicle_id]);
+
 
     const days = Math.ceil(
         (new Date(rent_end_date as string).getTime() - new Date(rent_start_date as string).getTime()) /
@@ -34,7 +41,6 @@ const createBooking = async (payload: Record<string, unknown>) => {
     })
 }
 
-
 const getAllBookings = async () => {
     const result = await pool.query('SELECT * FROM bookings');
 
@@ -57,7 +63,6 @@ const getAllBookings = async () => {
         booking.rent_end_date = new Date(booking.rent_end_date).toLocaleDateString('en-CA');
         const customer = customersData.rows.find(c => c.id === booking.customer_id);
         if (customer) {
-            // clone object so original stays intact
             const { id, ...customerData } = customer;
             booking.customer = customerData;
         }
@@ -68,7 +73,6 @@ const getAllBookings = async () => {
         booking.rent_end_date = new Date(booking.rent_end_date).toLocaleDateString('en-CA');
         const vehicle = vehiclesData.rows.find(c => c.id === booking.vehicle_id);
         if (vehicle) {
-            // clone object so original stays intact
             const { id, ...vehicleData } = vehicle;
             booking.vehicle = vehicleData;
         }
@@ -102,9 +106,70 @@ const getCustomerBookings = async (customerId: string) => {
 }
 
 
+const cancelBooking = async (bookingId: string | undefined, payload: Record<string, unknown>) => {
+    const { status } = payload;
+    if (status !== 'cancelled') {
+        throw new Error("Invalid status update. Customer can only cancel the booking.");
+    }
+    const result = await pool.query(`
+        UPDATE bookings SET 
+            status = COALESCE($1, status)
+        WHERE id = $2
+        RETURNING *
+    `, [status, bookingId]);
+
+ await pool.query(`
+        UPDATE vehicles SET 
+            availability_status = COALESCE($1, availability_status)
+        WHERE id =$2
+        RETURNING *
+    `, ['available', result.rows[0].vehicle_id]);
+
+    return result;
+}
+
+const returnedBooking = async (bookingId: string | undefined, payload: Record<string, unknown>) => {
+    const { status } = payload;
+    if (status !== 'returned') {
+        throw new Error("Invalid status update. Admin can only mark the booking as returned.");
+    }
+
+    const result = await pool.query(`
+        UPDATE bookings SET 
+            status = COALESCE($1, status)
+        WHERE id = $2
+        RETURNING *
+    `, [status, bookingId]);
+
+
+    const updateVahecleAvailability = await pool.query(`
+        UPDATE vehicles SET 
+            availability_status = COALESCE($1, availability_status)
+        WHERE id =$2
+        RETURNING *
+    `, ['available', result.rows[0].vehicle_id]);
+
+    // result.rows[0].vehicle = updateVahecleAvailability.rows[0].availability_status;
+    // console.log(updateVahecleAvailability.rows);
+
+    const finalResult = {
+        ...result.rows[0],
+        vehicle: {
+           availability_status: updateVahecleAvailability.rows[0].availability_status
+        }
+    }
+
+    return finalResult;
+
+}
+
+
+
 
 export const bookingServices = {
     createBooking,
     getAllBookings,
-    getCustomerBookings
+    getCustomerBookings,
+    cancelBooking,
+    returnedBooking
 }
