@@ -42,11 +42,20 @@ const deleteVehicle = async(id: string | unknown) => {
     return result;
 }
 
+const availabilityAfterExpired = async(vehicleId: number|undefined) => {
+    await pool.query(`
+        UPDATE vehicles SET
+            availability_status = COALESCE($1, availability_status)
+        WHERE id = $2
+    `, ['available', vehicleId]);
+}
+
 
 export const vehicleServices = {
     createVehecle,
     getAllvehicles,
     getSinglevehicle,
     updateVehicle,
-    deleteVehicle
+    deleteVehicle,
+    availabilityAfterExpired
 }

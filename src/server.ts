@@ -6,6 +6,7 @@ import { userRouter } from './modules/users/users.routes';
 import { vehicleRouter } from './modules/vehicles/vehicle.routes';
 import { bookingRouter } from './modules/bookings/booking.routes';
 import { authRouter } from './modules/auth/auth.routes';
+import './autoSystem/autoReturn';
 
 const app = express()
 const port = config.port

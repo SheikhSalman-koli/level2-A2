@@ -160,6 +160,24 @@ const returnedBooking = async (bookingId: string | undefined, payload: Record<st
     }
 
     return finalResult;
+}
+
+
+const getExpiredBookings = async () => {
+    const result = await pool.query(`
+        SELECT * FROM bookings 
+        WHERE rent_end_date < CURRENT_DATE
+        AND status != 'returned'
+    `);
+    return result.rows;
+}
+
+const markBookingAsReturned = async (bookingId: number|undefined) => {
+    await pool.query(`
+        UPDATE bookings SET 
+            status = COALESCE($1, status)
+        WHERE id = $2
+    `, ['returned',bookingId]);
 
 }
 
@@ -171,5 +189,7 @@ export const bookingServices = {
     getAllBookings,
     getCustomerBookings,
     cancelBooking,
-    returnedBooking
+    returnedBooking,
+    getExpiredBookings,
+    markBookingAsReturned
 }
