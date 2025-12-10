@@ -4,7 +4,7 @@ import { userServices } from "./users.service";
 const getAllUser =async (req:Request, res: Response) => {
     try {
                 const result = await userServices.getAllUser()
-                res.status(201).json({
+                res.status(200).json({
                     success: true,
                     message: "Users retrieved successfully",
                     data: result.rows
@@ -22,7 +22,7 @@ const getAllUser =async (req:Request, res: Response) => {
 const updateUser = async(req:Request, res: Response) => {
     try {
         const result = await userServices.updateUser(req?.body, req?.params.userId as string);
-         res.status(201).json({
+         res.status(200).json({
                     success: true,
                     message: "User updated successfully",
                     data: result.rows[0]
@@ -41,7 +41,7 @@ const updateUser = async(req:Request, res: Response) => {
 const deleteUser = async(req:Request, res: Response) => {
     try {
         const result = await userServices.deleteUser(req?.params.userId as string); 
-            res.status(201).json({
+            res.status(200).json({
 
                     success: true,
                     message: "User deleted successfully",

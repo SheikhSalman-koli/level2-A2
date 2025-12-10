@@ -111,6 +111,16 @@ const cancelBooking = async (bookingId: string | undefined, payload: Record<stri
     if (status !== 'cancelled') {
         throw new Error("Invalid status update. Customer can only cancel the booking.");
     }
+
+    const rentStartDate = await pool.query(`
+        SELECT rent_start_date FROM bookings WHERE id = $1
+    `, [bookingId]);
+    const currentDate = new Date();
+    const startDate = new Date(rentStartDate.rows[0].rent_start_date);
+    if (currentDate >= startDate) {
+        throw new Error("Booking cannot be cancelled on or after the rent start date.");
+    }
+
     const result = await pool.query(`
         UPDATE bookings SET 
             status = COALESCE($1, status)
