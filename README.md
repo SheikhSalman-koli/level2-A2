@@ -2,7 +2,7 @@
 
 A complete vehicle rental & management platform designed for efficient booking, rental tracking, and automated schedule handling.
 
-🔗 **Live URL:** *Will be added after deployment*
+🔗 **Live URL:** [visit site](https://wheel-world.vercel.app)
 
 
 ## 📌 Features
@@ -66,8 +66,8 @@ A complete vehicle rental & management platform designed for efficient booking, 
 ### 1️⃣ Clone the Repo
 
 ```bash
-git clone https://github.com/your-username/wheel-world.git
-cd wheel-world
+git clone https://github.com/SheikhSalman-koli/level2-A2.git
+cd level2-A2
 
 ```
 ## Install Dependencies
@@ -75,7 +75,9 @@ npm install
 
 ## Create .env File
 PORT=5000
+
 DATABASE_URL=<your_neon_database_url>
+
 NODE_ENV=development
 
 ## Start Development Server

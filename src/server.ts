@@ -1,5 +1,5 @@
 
-import express, { Request, Response } from 'express'
+import express from 'express'
 import config from './config';
 import initDB from './config/db';
 import { userRouter } from './modules/users/users.routes';
@@ -15,10 +15,6 @@ app.use(express.json())
 
 
 initDB();
-
-app.get('/', (req: Request, res: Response) => {
-    res.send('Hello World! i am learning typescript with nodejs. added watch mode, done')
-})
 
 
 //auth routes
