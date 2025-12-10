@@ -69,6 +69,7 @@ A complete vehicle rental & management platform designed for efficient booking, 
 git clone https://github.com/your-username/wheel-world.git
 cd wheel-world
 
+```
 ## Install Dependencies
 npm install
 
