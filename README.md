@@ -4,6 +4,18 @@ A complete vehicle rental & management platform designed for efficient booking, 
 
 🔗 **Live URL:** [visit site](https://wheel-world.vercel.app)
 
+# admin creadentials
+
+"email": "sheikh@example.com",
+"password": "securePassword123"
+
+# customer creadentials
+
+"email": "shakera@example.com",
+"password": "securePassword123"
+
+
+
 
 ## 📌 Features
 
