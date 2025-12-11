@@ -5,9 +5,13 @@ const createBooking = async (payload: Record<string, unknown>) => {
     const { customer_id, vehicle_id, rent_start_date, rent_end_date } = payload;
 
     const vehicleData = await pool.query(`
-        SELECT vehicle_name, daily_rent_price FROM vehicles WHERE id = $1
+        SELECT vehicle_name, daily_rent_price, availability_status FROM vehicles WHERE id = $1
         `, [vehicle_id]
     )
+
+    if(vehicleData.rows[0].availability_status !== 'available'){
+        throw new Error("Vehicle is not available for booking.");
+    }
 
     await pool.query(`
         UPDATE vehicles SET 

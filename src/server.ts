@@ -1,5 +1,5 @@
 
-import express from 'express'
+import express, { Request, Response } from 'express'
 import config from './config';
 import initDB from './config/db';
 import { userRouter } from './modules/users/users.routes';
@@ -16,6 +16,9 @@ app.use(express.json())
 
 initDB();
 
+app.get('/', (req: Request, res: Response) => {
+  res.send('Hello World from sheikh salman !')
+})
 
 //auth routes
 app.use("/api/v1/auth", authRouter)

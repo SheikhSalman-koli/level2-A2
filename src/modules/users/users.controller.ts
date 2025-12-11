@@ -21,7 +21,19 @@ const getAllUser =async (req:Request, res: Response) => {
 
 const updateUser = async(req:Request, res: Response) => {
     try {
-        const result = await userServices.updateUser(req?.body, req?.params.userId as string);
+
+        const {role, email} = req?.user as { role: string, email: string};
+        let result : any;
+
+        if(role === 'admin'){  
+            result = await userServices.updateUsers(req?.body, req?.params.userId as string);
+        }
+        else if(role === 'customer' && req?.params.email === email){
+            result = await userServices.updateProfile(req?.body, req?.params.userId as string);
+        }else{
+            throw new Error('You can only update your own profile.');
+        }
+
          res.status(200).json({
                     success: true,
                     message: "User updated successfully",

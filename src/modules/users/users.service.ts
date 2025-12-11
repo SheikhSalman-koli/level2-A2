@@ -6,26 +6,42 @@ const getAllUser = async () => {
     return result;
 }
 
-const updateUser = async (payload: Record<string, unknown>, id: string | undefined) => {
-  const { name, email, password, phone, role } = payload;
-
-  let hashedPassword = null;
-  
-  if (password) {
-    hashedPassword = await bcrypt.hash(password as string, 10);
-  }
+const updateUsers = async (payload: Record<string, unknown>, id: string | undefined) => {
+  const { name, email, phone, role } = payload;
 
   const result = await pool.query(`
     UPDATE users SET 
         name = COALESCE($1, name),
         email = COALESCE($2, email),
         phone = COALESCE($3, phone),
-        password = COALESCE($4, password),
-        role = COALESCE($5, role)
-    WHERE id = $6
+        role = COALESCE($4, role)
+    WHERE id = $5
     RETURNING *
-  `, [name, email, phone, hashedPassword, role, id]);
+  `, [name, email, phone, role, id]);
 
+  delete result.rows[0].password;
+
+  return result;
+}
+
+
+const updateProfile = async (payload: Record<string, unknown>, id: string | undefined) => {
+
+  const { name, email, password, phone } = payload;
+  let hashedPassword = null;
+  
+  if (password) {
+    hashedPassword = await bcrypt.hash(password as string, 10);
+  } 
+  const result = await pool.query(`
+    UPDATE users SET 
+        name = COALESCE($1, name),
+        email = COALESCE($2, email),
+        phone = COALESCE($3, phone),
+        password = COALESCE($4, password)
+    WHERE id = $5
+    RETURNING *
+  `, [name, email, phone, hashedPassword, id]);
   return result;
 }
 
@@ -44,7 +60,8 @@ const deleteUser = async (id: string | undefined) => {
 
 export const userServices = {
     getAllUser,
-    updateUser,
+    updateUsers,
+    updateProfile,
     deleteUser
 }
 
