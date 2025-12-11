@@ -9,6 +9,15 @@ const createBooking = async (payload: Record<string, unknown>) => {
         `, [vehicle_id]
     )
 
+    const validDate = new Date(rent_end_date as string) > new Date(rent_start_date as string);
+    if(!validDate){
+        throw new Error("Invalid date range: rent_end_date must be after rent_start_date.");
+    }
+
+    if(vehicleData.rows.length === 0){
+        throw new Error("Vehicle not found.");
+    }
+
     if(vehicleData.rows[0].availability_status !== 'available'){
         throw new Error("Vehicle is not available for booking.");
     }
@@ -44,6 +53,7 @@ const createBooking = async (payload: Record<string, unknown>) => {
         vehicle: vehicleData.rows[0]
     })
 }
+
 
 const getAllBookings = async () => {
     const result = await pool.query('SELECT * FROM bookings');
