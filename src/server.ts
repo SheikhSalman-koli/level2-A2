@@ -2,6 +2,7 @@
 import express, { Request, Response } from 'express'
 import config from './config';
 import initDB from './config/db';
+import cors from 'cors'
 import { userRouter } from './modules/users/users.routes';
 import { vehicleRouter } from './modules/vehicles/vehicle.routes';
 import { bookingRouter } from './modules/bookings/booking.routes';
@@ -11,8 +12,18 @@ import './autoSystem/autoReturn';
 const app = express()
 const port = config.port
 
-app.use(express.json())
+const corsOptions = {
+  origin: [
+    'https://wheel-world.vercel.app'          
+  ],
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  credentials: true,
+  optionsSuccessStatus: 204
+};
 
+//middleware
+app.use(cors(corsOptions));
+app.use(express.json())
 
 initDB();
 
