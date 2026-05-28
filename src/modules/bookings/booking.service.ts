@@ -1,4 +1,5 @@
 import { pool } from "../../config/db";
+import { QueryResult } from 'pg';
 
 
 const createBooking = async (payload: Record<string, unknown>) => {
@@ -8,7 +9,7 @@ const createBooking = async (payload: Record<string, unknown>) => {
         SELECT vehicle_name, daily_rent_price, availability_status FROM vehicles WHERE id = $1
         `, [vehicle_id]
     )
-
+// console.log(vehicleData);
     const validDate = new Date(rent_end_date as string) > new Date(rent_start_date as string);
     if(!validDate){
         throw new Error("Invalid date range: rent_end_date must be after rent_start_date.");
@@ -48,9 +49,10 @@ const createBooking = async (payload: Record<string, unknown>) => {
     booking.rent_start_date = rent_start_date as string;
     booking.rent_end_date = rent_end_date as string;
 
+    const { vehicle_name, daily_rent_price } = vehicleData.rows[0];
     return ({
         booking,
-        vehicle: vehicleData.rows[0]
+        vehicle: { vehicle_name, daily_rent_price }
     })
 }
 
@@ -85,7 +87,7 @@ const getAllBookings = async () => {
     result.rows.forEach(booking => {
         booking.rent_start_date = new Date(booking.rent_start_date).toLocaleDateString('en-CA');
         booking.rent_end_date = new Date(booking.rent_end_date).toLocaleDateString('en-CA');
-        const vehicle = vehiclesData.rows.find(c => c.id === booking.vehicle_id);
+        const vehicle = vehiclesData.rows.find(c => c?.id === booking?.vehicle_id);
         if (vehicle) {
             const { id, ...vehicleData } = vehicle;
             booking.vehicle = vehicleData;
@@ -196,15 +198,20 @@ const getExpiredBookings = async () => {
     return result.rows;
 }
 
-const markBookingAsReturned = async (bookingId: number|undefined) => {
-    await pool.query(`
-        UPDATE bookings SET 
-            status = COALESCE($1, status)
+const markBookingAsReturned = async (bookingId: number | undefined): Promise<QueryResult | null> => {
+    // 1. Guard clause to prevent running a broken query if bookingId is undefined
+    if (bookingId === undefined) {
+        // console.warn("markBookingAsReturned called with undefined bookingId");
+        return null; 
+    }
+
+    // 2. Explicitly pass parameters matching the placeholders ($1 and $2)
+    return await pool.query(`
+        UPDATE bookings 
+        SET status = COALESCE($1, status)
         WHERE id = $2
-    `, ['returned',bookingId]);
-
+    `, ['returned', bookingId]);
 }
-
 
 
 
